@@ -1,25 +1,29 @@
 import type { RawSession, Session } from '../contracts.js';
 
+function stringifyDisplayValue(value: unknown): string {
+  if (value === undefined || value === null) return '';
+  if (typeof value === 'string') return value.trim();
+  return String(value).trim();
+}
+
+function extractDisplayValue(field: unknown): string {
+  if (!field) return '';
+  if (typeof field === 'object' && field !== null && 'displayValue' in field) {
+    return stringifyDisplayValue((field as { displayValue?: unknown }).displayValue);
+  }
+  return stringifyDisplayValue(field);
+}
+
 // Extract displayValue from nested dict fields, handling all observed shapes
 function extractDisplayValues(field: unknown): string {
   if (!field) return '';
-  if (typeof field === 'string') return field;
   if (Array.isArray(field)) {
     return field
-      .map((item) => {
-        if (typeof item === 'string') return item;
-        if (item && typeof item === 'object' && 'displayValue' in item) {
-          return (item as { displayValue?: string }).displayValue ?? '';
-        }
-        return String(item);
-      })
+      .map((item) => extractDisplayValue(item))
       .filter(Boolean)
       .join(', ');
   }
-  if (typeof field === 'object' && field !== null && 'displayValue' in field) {
-    return (field as { displayValue?: string }).displayValue ?? '';
-  }
-  return String(field);
+  return extractDisplayValue(field);
 }
 
 export function normalizeSession(raw: RawSession, eventId: string): Session | null {

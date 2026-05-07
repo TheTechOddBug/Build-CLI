@@ -36,12 +36,17 @@ describe('normalizeSession', () => {
       sessionCode: 'BRK999',
       title: 'Object location',
       location: {
-        displayValue: 'Festival Pavilion',
+        displayValue: '  Festival Pavilion  ',
         logicalValue: 'Festival Pavilion',
       },
+      product: [
+        { displayValue: '  Azure AI Foundry  ' },
+        '  GitHub  ',
+      ],
     }, 'build-2026');
 
     expect(session!.location).toBe('Festival Pavilion');
+    expect(session!.product).toBe('Azure AI Foundry, GitHub');
   });
 
   it('handles empty product arrays', () => {

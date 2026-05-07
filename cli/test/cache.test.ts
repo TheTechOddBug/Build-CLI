@@ -83,6 +83,13 @@ describe('automatic cache revalidation', () => {
     );
   }
 
+  async function writeSessionsOnly(eventId: string, sessionCode: string = 'KEY01'): Promise<void> {
+    await writeFile(
+      join(cacheDir, `${eventId}-sessions.json`),
+      JSON.stringify([session(eventId, sessionCode)]),
+    );
+  }
+
   beforeEach(async () => {
     cacheDir = await mkdtemp(join(tmpdir(), 'msevents-cache-test-'));
     process.env.MSEVENTS_CACHE_DIR = cacheDir;
@@ -94,6 +101,7 @@ describe('automatic cache revalidation', () => {
 
   afterEach(async () => {
     vi.useRealTimers();
+    vi.unstubAllGlobals();
     vi.restoreAllMocks();
     delete process.env.MSEVENTS_CACHE_DIR;
     await rm(cacheDir, { recursive: true, force: true });
@@ -162,6 +170,31 @@ describe('automatic cache revalidation', () => {
     expect(updatedMeta?.consecutiveFailures).toBe(2);
     expect(updatedMeta?.checkedAt).toBe(NOW);
     expect(Date.parse(updatedMeta?.nextCheckAt ?? '')).toBeGreaterThan(Date.parse(NOW));
+  });
+
+  it('repairs missing metadata after failed revalidation so backoff still applies', async () => {
+    await writeSessionsOnly('build-2025');
+    await writeCachedEvent('build-2026');
+    const fetchMock = vi.fn().mockRejectedValue(new TypeError('network down'));
+    vi.stubGlobal('fetch', fetchMock);
+
+    await ensureCache();
+
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    const repairedMeta = await readMeta('build-2025');
+    expect(repairedMeta).toMatchObject({
+      eventId: 'build-2025',
+      sessionCount: 1,
+      lastCheckStatus: 'failed',
+      consecutiveFailures: 1,
+      checkedAt: NOW,
+    });
+    expect(Date.parse(repairedMeta?.nextCheckAt ?? '')).toBeGreaterThan(Date.parse(NOW));
+
+    fetchMock.mockClear();
+    await ensureCache();
+
+    expect(fetchMock).not.toHaveBeenCalled();
   });
 
   it('fetches and caches missing events automatically', async () => {

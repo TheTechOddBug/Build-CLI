@@ -1,4 +1,4 @@
-import { readFile, writeFile, mkdir } from 'node:fs/promises';
+import { readFile, writeFile, mkdir, stat } from 'node:fs/promises';
 import { join } from 'node:path';
 import { existsSync } from 'node:fs';
 import envPaths from 'env-paths';
@@ -101,6 +101,15 @@ export function isCacheCheckDue(meta: CacheMeta | null, now: Date = new Date()):
 async function writeMeta(eventId: string, meta: CacheMeta): Promise<void> {
   await ensureCacheDir();
   await writeFile(metaPath(eventId), JSON.stringify(meta, null, 2));
+}
+
+async function cachedSessionsTimestamp(eventId: string, fallback: Date): Promise<string> {
+  try {
+    const stats = await stat(sessionsPath(eventId));
+    return stats.mtime.toISOString();
+  } catch {
+    return fallback.toISOString();
+  }
 }
 
 export async function readMeta(eventId: string): Promise<CacheMeta | null> {
@@ -238,15 +247,25 @@ export async function fetchAndCache(
 
 export async function recordFailedCheck(eventId: string): Promise<void> {
   const existingMeta = await readMeta(eventId);
-  if (!existingMeta) return;
+  const existingSessions = existingMeta ? [] : await readSessions(eventId);
+  if (!existingMeta && existingSessions.length === 0) return;
 
   const now = new Date();
-  const checkedMeta: CacheMeta = {
-    ...existingMeta,
-    checkedAt: now.toISOString(),
-    lastCheckStatus: 'failed',
-    consecutiveFailures: (existingMeta.consecutiveFailures ?? 0) + 1,
-  };
+  const checkedMeta: CacheMeta = existingMeta
+    ? {
+        ...existingMeta,
+        checkedAt: now.toISOString(),
+        lastCheckStatus: 'failed',
+        consecutiveFailures: (existingMeta.consecutiveFailures ?? 0) + 1,
+      }
+    : {
+        eventId,
+        fetchedAt: await cachedSessionsTimestamp(eventId, now),
+        checkedAt: now.toISOString(),
+        sessionCount: existingSessions.length,
+        lastCheckStatus: 'failed',
+        consecutiveFailures: 1,
+      };
   checkedMeta.nextCheckAt = nextCheckAt(checkedMeta, 'failed', now);
   await writeMeta(eventId, checkedMeta);
 }
