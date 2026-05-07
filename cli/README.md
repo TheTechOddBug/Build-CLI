@@ -53,9 +53,9 @@ Available commands:
   - `--limit <n>` max results (default: 10)
 - `session <code>` looks up a specific session by code. Searches all cached events; disambiguates if the code appears in multiple events.
   - `--event <id>` scope to a specific event
-- `refresh` downloads and caches session catalogs.
-  - `--event <id>` refresh a specific event only
-  - `--force` bypass cache, re-fetch unconditionally
+- `refresh` checks for session catalog updates and updates the local cache.
+  - `--event <id>` check a specific event only
+  - `--force` bypass conditional revalidation and re-fetch unconditionally
 - `status` shows what's cached and how fresh it is.
 
 The `sessions` and `session` commands output human-readable text by default. Pass `--json` to get structured JSON, which is useful for piping to agents or other tools:
@@ -77,8 +77,9 @@ Use `--event <id>` to filter to a single event. Without it, commands search acro
 
 ## Behavior
 
-- **Auto-refresh**: on first search, the CLI fetches and caches automatically. No explicit `refresh` needed.
-- **Cache TTL**: 24 hours. `refresh --force` bypasses.
+- **Auto-refresh**: search and lookup commands are cache-first. Missing caches are fetched automatically, and existing caches are revalidated only when their next check is due.
+- **Revalidation**: due caches use conditional GET (ETag/Last-Modified). A 304 response avoids downloading the catalog body; network failures fall back to stale cache.
+- **Network-friendly checks**: recent checks are skipped, stable catalogs are checked less often, and failed checks use backoff with jitter to avoid request spikes.
 - **Disambiguation**: if a session code exists in multiple events, the CLI shows options.
 - **Results**: 10 by default, `--limit` to override.
 

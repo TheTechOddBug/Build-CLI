@@ -31,6 +31,24 @@ describe('normalizeSession', () => {
     expect(session!.level).toContain('200');
   });
 
+  it('handles location as a displayValue object', () => {
+    const session = normalizeSession({
+      sessionCode: 'BRK999',
+      title: 'Object location',
+      location: {
+        displayValue: '  Festival Pavilion  ',
+        logicalValue: 'Festival Pavilion',
+      },
+      product: [
+        { displayValue: '  Azure AI Foundry  ' },
+        '  GitHub  ',
+      ],
+    }, 'build-2026');
+
+    expect(session!.location).toBe('Festival Pavilion');
+    expect(session!.product).toBe('Azure AI Foundry, GitHub');
+  });
+
   it('handles empty product arrays', () => {
     // Many sessions have product: []
     const raw = rawSessions.find((s) => s.sessionCode === 'BRK154')!;
