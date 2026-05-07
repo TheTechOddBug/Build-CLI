@@ -38,7 +38,7 @@ export function normalizeSession(raw: RawSession, eventId: string): Session | nu
     timeSlot: raw.TimeSlot?.trim() ?? '',
     startDateTime: raw.startDateTime ?? '',
     endDateTime: raw.endDateTime ?? '',
-    location: raw.location?.trim() ?? '',
+    location: extractDisplayValues(raw.location),
     level: extractDisplayValues(raw.sessionLevel),
     type: extractDisplayValues(raw.sessionType),
     topic: extractDisplayValues(raw.topic),

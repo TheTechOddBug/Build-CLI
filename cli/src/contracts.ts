@@ -8,7 +8,9 @@ export interface RawSession {
   TimeSlot?: string;
   startDateTime?: string;
   endDateTime?: string;
-  location?: string;
+  location?: Array<{ displayValue?: string; logicalValue?: string } | string>
+    | { displayValue?: string; logicalValue?: string }
+    | string;
   sessionLevel?: Array<{ displayValue?: string; logicalValue?: string }> | string;
   sessionType?: { displayValue?: string; logicalValue?: string } | string;
   topic?: Array<{ displayValue?: string; logicalValue?: string }> | string;

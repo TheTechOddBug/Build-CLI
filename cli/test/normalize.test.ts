@@ -31,6 +31,19 @@ describe('normalizeSession', () => {
     expect(session!.level).toContain('200');
   });
 
+  it('handles location as a displayValue object', () => {
+    const session = normalizeSession({
+      sessionCode: 'BRK999',
+      title: 'Object location',
+      location: {
+        displayValue: 'Festival Pavilion',
+        logicalValue: 'Festival Pavilion',
+      },
+    }, 'build-2026');
+
+    expect(session!.location).toBe('Festival Pavilion');
+  });
+
   it('handles empty product arrays', () => {
     // Many sessions have product: []
     const raw = rawSessions.find((s) => s.sessionCode === 'BRK154')!;
