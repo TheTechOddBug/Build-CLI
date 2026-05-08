@@ -2,7 +2,7 @@
 
 ## How to get help
 
-This is the Microsoft Build CLI plugin for GitHub Copilot CLI. It helps you discover sessions, scaffold projects, and plan your Build schedule.
+This is the Microsoft Build CLI skill for GitHub Copilot CLI. It helps you discover sessions, scaffold projects, and plan your Build schedule.
 
 ### Questions and general discussion
 
