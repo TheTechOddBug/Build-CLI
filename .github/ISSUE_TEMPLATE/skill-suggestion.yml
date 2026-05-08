@@ -1,7 +1,7 @@
 name: 🎯 Skill Suggestion
 description: The skill should handle something differently
 title: "[Skill]: "
-labels: ["skill"]
+labels: ["enhancement"]
 body:
   - type: markdown
     attributes:
