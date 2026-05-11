@@ -1,57 +1,71 @@
 # Microsoft Build CLI
 
-The Microsoft Build CLI is a [GitHub Copilot CLI](https://docs.github.com/en/copilot/github-copilot-in-the-cli) skill that connects your local project to the Microsoft Build session catalog. It reads your dependencies, finds relevant sessions, and helps you plan your Build experience — all from your terminal.
+A [GitHub Copilot CLI](https://github.com/features/copilot/cli/) skill that connects your local project to the Microsoft Build session catalog. It reads your dependencies, finds relevant sessions, and helps you act on what you learn — all from your terminal.
 
-## Get Started
+> [!NOTE]
+> Build-CLI targets **Build 2026** and also indexes past events (Build 2025, Ignite 2025). It supports any future event that follows the same catalog endpoint pattern. It is not a replacement for the event app or session browser — it's a developer-first complement to them.
+
+## Quick Start
 
 1. Open **GitHub Copilot CLI** in any project and run:
-
-```
-/plugin install microsoft/Build-CLI
-```
-
-2. Restart your Copilot CLI session (exit and reopen).
-
+   ```
+   /plugin install microsoft/Build-CLI
+   ```
+2. Restart your Copilot CLI session:
+   ```
+   /restart
+   ```
 3. Try:
+   ```
+   What Build sessions are relevant to my project?
+   ```
 
-```
-What Build sessions are relevant to my project?
-```
+The skill reads `package.json`, `requirements.txt`, `.csproj`, `go.mod`, and other dependency files, maps them to Microsoft products, and searches the live Build 2026 session catalog.
 
-The skill reads your `package.json`, `requirements.txt`, `.csproj`, or other dependency files, maps them to Microsoft products, and searches the live Build 2026 session catalog for matches.
+## Requirements
+
+- [GitHub Copilot CLI](https://github.com/features/copilot/cli/) installed and authenticated
+- **Node.js 22+** (recommended) — enables the `@microsoft/events-cli` for faster local search and caching. Without Node.js, the skill falls back to direct HTTP and everything still works.
 
 ## What You Can Do
 
-| Ask the skill to... | Example |
-|---------------------|---------|
-| Find sessions for your project | *"What Build sessions should I attend?"* |
-| See what's new for your tech stack | *"What's new at Build for Azure Cosmos DB?"* |
-| Look up a session by code | *"Tell me about session BRK155"* |
-| Get next steps after a session | *"What should I do after session BRK155?"* |
-| Scaffold a project from a session | *"Scaffold a project from session BRK155"* |
-| Log notes during the event | *"Log a note from session BRK155: great agent demo"* |
+### Before Build — plan your schedule
+
+| Ask the skill to…                        | Example                                               |
+|------------------------------------------|-------------------------------------------------------|
+| Find sessions for your project           | *"What Build sessions should I attend?"*              |
+| See what's new for your tech stack       | *"What's new at Build for Azure Cosmos DB?"*          |
+| Look up a session by code                | *"Tell me about session BRK155"*                      |
+
+### During Build — capture what matters
+
+| Ask the skill to…                        | Example                                               |
+|------------------------------------------|-------------------------------------------------------|
+| Log notes tied to a session              | *"Log a note from session BRK155: great agent demo"*  |
+| Get next steps after a session           | *"What should I do after session BRK155?"*            |
+
+### After Build — ship what you learned
+
+| Ask the skill to…                        | Example                                               |
+|------------------------------------------|-------------------------------------------------------|
+| Scaffold a project from a session        | *"Scaffold a project from session BRK155"*            |
+| See what changed for your project        | *"What changed at Build for my project?"*             |
 
 ## How It Works
 
-The skill pulls session data from the **live Build 2026 catalog** — no stale data, no manual updates. For SDK docs and code samples, it uses the **Microsoft Learn MCP Server**.
+The skill is a thin layer over the **live Build 2026 catalog API** — no stale data, no manual updates. For SDK docs and code samples, it falls back to the [Microsoft Learn MCP Server](https://learn.microsoft.com/training/support/mcp).
 
-If you have **Node.js 22+** installed, the skill automatically uses the `@microsoft/events-cli` for faster local search and caching. Without Node.js, it falls back to direct HTTP — everything still works.
+Session results are a starting point. For broad topics, ask the agent to refine (*"show me more Foundry sessions about observability"*) or browse the full catalog at [build.microsoft.com/sessions](https://build.microsoft.com/sessions).
 
-Session results are a starting point — for broad topics, ask the agent to refine ("show me more Foundry sessions about observability") or browse the full catalog at [build.microsoft.com/sessions](https://build.microsoft.com/sessions).
+## Scope and Limitations
+
+- **Event-scoped:** Targets Build 2026, with Build 2025 and Ignite 2025 also available. The architecture supports any event that uses the same catalog endpoints.
+- **Dependency-driven:** Recommendations are only as good as the dependency files in your project root. If your project doesn't have a manifest file, tell the skill your stack directly.
+- **Not offline:** Requires network access to query the catalog and Learn MCP server.
 
 ## Contributing
 
-This project welcomes contributions and suggestions.  Most contributions require you to agree to a
-Contributor License Agreement (CLA) declaring that you have the right to, and actually do, grant us
-the rights to use your contribution. For details, visit [Contributor License Agreements](https://cla.opensource.microsoft.com).
-
-When you submit a pull request, a CLA bot will automatically determine whether you need to provide
-a CLA and decorate the PR appropriately (e.g., status check, comment). Simply follow the instructions
-provided by the bot. You will only need to do this once across all repos using our CLA.
-
-This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/).
-For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or
-contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for details on how to contribute to this project.
 
 ## Trademarks
 
