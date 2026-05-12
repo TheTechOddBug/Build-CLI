@@ -65,7 +65,7 @@ Session results are a starting point. For broad topics, ask the agent to refine 
 |--------|---------------|
 | GitHub Copilot CLI | `/plugin install microsoft/Build-CLI` then `/restart` |
 | VS Code | Open Extensions (Ctrl+Shift+X), search `@agentPlugins microsoft-events`, and install |
-| Visual Studio 2026 | Copy `skills/microsoft-build/` to a [supported skill location](https://learn.microsoft.com/visualstudio/ide/copilot-agent-skills). Learn MCP Server is preconfigured. |
+| Visual Studio 2026 | Copy `skills/microsoft-build/` to a [supported skill location](https://learn.microsoft.com/visualstudio/ide/copilot-agent-skills) |
 | Claude Code | `/plugin marketplace add microsoft/Build-CLI` then `/plugin install microsoft-events@microsoft-events-marketplace` |
 
 ## Scope and Limitations
